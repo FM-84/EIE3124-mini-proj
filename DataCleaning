@@ -1,0 +1,35 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Read the dataset
+names = ['CRIM','ZN','INDUS','CHAS','NOX','RM','AGE','DIS','RAD','TAX','PTRATIO','B','LSTAT','MEDV']
+dataset = pd.read_csv('boston.csv', skiprows=1, names=names)
+
+# Identify missing values
+missing_values = dataset.isnull().sum()
+
+# Remove missing values
+dataset = dataset.dropna()
+
+# Identify outliers
+plt.figure(figsize=(10, 6))
+dataset.boxplot(column=names)
+plt.xticks(rotation=45)
+plt.show()
+
+# Remove outliers
+z_scores = np.abs((dataset - dataset.mean()) / dataset.std())
+dataset = dataset[(z_scores < 3).all(axis=1)]
+
+# Impute missing values (Replace missing values with mean)
+dataset = dataset.fillna(dataset.mean())  
+
+# Plot the cleaned dataset
+plt.figure(figsize=(8, 6))
+plt.scatter(dataset['LSTAT'], dataset['MEDV'], alpha=0.7, c='b')
+plt.xlabel('LSTAT')
+plt.ylabel('MEDV')
+plt.title('Relationship between LSTAT and MEDV')
+plt.grid(True)
+plt.show()
